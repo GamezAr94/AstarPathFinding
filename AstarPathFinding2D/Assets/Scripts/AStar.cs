@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
-public enum TileType { STAR, GOAL, WATER, GRASS, PATH}
+public enum TileType { START, GOAL, WATER, GRASS, PATH}
 
 public class AStar : MonoBehaviour
 {
@@ -21,6 +21,8 @@ public class AStar : MonoBehaviour
 
     private TileType tileType;
 
+    private Vector3Int startPos, goalPos;
+
     // Update is called once per frame
     void Update()
     {
@@ -34,6 +36,16 @@ public class AStar : MonoBehaviour
                 ChangeTile(clickPos);
             }
         }
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            //Run Algorithm
+            Algorithm();
+        }
+    }
+
+    private void Algorithm()
+    {
+        AStarDebbuger.myInstance.CreateTiles(startPos,goalPos);
     }
 
     public void ChangeTileType(TileButton button)
@@ -43,6 +55,12 @@ public class AStar : MonoBehaviour
 
     private void ChangeTile(Vector3Int clickPos)
     {
+        if(tileType == TileType.START)
+        {
+            startPos = clickPos;
+        }else if(tileType==TileType.GOAL){
+            goalPos = clickPos;
+        }
         tileMap.SetTile(clickPos, tiles[(int)tileType]);
     }
 }
