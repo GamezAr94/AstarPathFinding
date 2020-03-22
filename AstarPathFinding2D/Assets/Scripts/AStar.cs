@@ -27,6 +27,8 @@ public class AStar : MonoBehaviour
 
     private HashSet<Node> openList;
 
+    private HashSet<Node> closedList;
+
     private Dictionary<Vector3Int, Node> allNodes = new Dictionary<Vector3Int, Node>();
 
     //Ignoring Water
@@ -58,6 +60,8 @@ public class AStar : MonoBehaviour
 
         openList = new HashSet<Node>();
 
+        closedList = new HashSet<Node>();
+
         //Adding start to the open list
         openList.Add(current);
     }
@@ -73,7 +77,10 @@ public class AStar : MonoBehaviour
 
         ExamineNeighbors(neighbors,current);
 
-        AStarDebbuger.myInstance.CreateTiles(openList, startPos,goalPos);
+        UpdateCurrentTile(ref current);
+
+        AStarDebbuger.myInstance.CreateTiles(openList,closedList, allNodes, startPos,goalPos);
+
     }
 
     private List<Node> findNeighbors(Vector3Int parentPosition)
@@ -102,7 +109,21 @@ public class AStar : MonoBehaviour
         for(int i = 0; i < neighbors.Count; i++)
         {
             openList.Add(neighbors[i]);
+
+            CalcValue(current, neighbors[i], 0);
         }
+    }
+
+    private void CalcValue(Node parent, Node neighbor, int cost)
+    {
+        neighbor.Parent = parent;
+    }
+
+    private void UpdateCurrentTile(ref Node current)
+    {
+        openList.Remove(current);
+
+        closedList.Add(current);
     }
 
     private Node GetNode(Vector3Int position)
