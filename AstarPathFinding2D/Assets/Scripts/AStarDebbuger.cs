@@ -57,6 +57,11 @@ public class AStarDebbuger : MonoBehaviour
 
     private void GenerateDebugText(Node node, DebugText debugText)
     {
+
+        debugText.F.text = $"F: {node.F}";
+        debugText.G.text = $"G: {node.G}";
+        debugText.H.text = $"H: {node.H}";
+        debugText.P.text = $"P: {node.Position.x},{node.Position.y}";
         if (node.Parent.Position.x < node.Position.x && node.Parent.Position.y == node.Position.y)
         {
             debugText.MyArrow.localRotation = Quaternion.Euler(new Vector3(0, 0, 180));

@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
@@ -110,13 +111,40 @@ public class AStar : MonoBehaviour
         {
             openList.Add(neighbors[i]);
 
-            CalcValue(current, neighbors[i], 0);
+            int gScore = DetermineGScore(neighbors[i].Position, current.Position);
+
+            CalcValue(current, neighbors[i], gScore);
         }
     }
 
     private void CalcValue(Node parent, Node neighbor, int cost)
     {
         neighbor.Parent = parent;
+
+        neighbor.G = parent.G + cost;
+
+        neighbor.H = ((Math.Abs((neighbor.Position.x - goalPos.x)) + Math.Abs((neighbor.Position.y - goalPos.y))) * 10);
+
+        neighbor.F = neighbor.G + neighbor.H;
+
+    }
+
+    private int DetermineGScore(Vector3Int neighbor, Vector3Int current)
+    {
+        int gScore = 0;
+
+        int x = current.x - neighbor.x;
+        int y = current.y - neighbor.y;
+
+        if (Math.Abs(x - y) % 2 == 1)
+        {
+            gScore = 10;
+        }
+        else
+        {
+            gScore = 14;
+        }
+        return gScore;
     }
 
     private void UpdateCurrentTile(ref Node current)
