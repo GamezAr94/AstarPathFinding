@@ -31,7 +31,7 @@ public class AStarDebbuger : MonoBehaviour
     [SerializeField]
     private GameObject debugTextPrefab;
     private List<GameObject> debugObjects = new List<GameObject>();
-    public void CreateTiles(HashSet<Node> openList,HashSet<Node> closedList,Dictionary<Vector3Int,Node> allNodes, Vector3Int start, Vector3Int goal)
+    public void CreateTiles(HashSet<Node> openList,HashSet<Node> closedList,Dictionary<Vector3Int,Node> allNodes, Vector3Int start, Vector3Int goal, Stack<Vector3Int> path = null)
     {
         foreach(Node node in openList)
         {
@@ -39,6 +39,17 @@ public class AStarDebbuger : MonoBehaviour
         }
         foreach(Node node in closedList){
             ColorTile(node.Position, closedColor);
+        }
+
+        if (path != null)
+        {
+            foreach(Vector3Int pos in path)
+            {
+                if(pos != start && pos != goal)
+                {
+                    ColorTile(pos, pathColor);
+                }
+            }
         }
 
         ColorTile(start, startColor);

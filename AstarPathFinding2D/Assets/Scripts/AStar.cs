@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
@@ -29,6 +30,8 @@ public class AStar : MonoBehaviour
     private HashSet<Node> openList;
 
     private HashSet<Node> closedList;
+
+    private Stack<Vector3Int> path;
 
     private Dictionary<Vector3Int, Node> allNodes = new Dictionary<Vector3Int, Node>();
 
@@ -74,13 +77,18 @@ public class AStar : MonoBehaviour
             Initialize();
         }
 
-        List<Node> neighbors = findNeighbors(current.Position);
+        while(openList.Count > 0 && path == null)
+        {
+            List<Node> neighbors = findNeighbors(current.Position);
 
-        ExamineNeighbors(neighbors,current);
+            ExamineNeighbors(neighbors, current);
 
-        UpdateCurrentTile(ref current);
+            UpdateCurrentTile(ref current);
 
-        AStarDebbuger.myInstance.CreateTiles(openList,closedList, allNodes, startPos,goalPos);
+            path = GeneratePath(current);
+        }
+
+        AStarDebbuger.myInstance.CreateTiles(openList, closedList, allNodes, startPos, goalPos, path);
 
     }
 
@@ -109,11 +117,22 @@ public class AStar : MonoBehaviour
     {
         for(int i = 0; i < neighbors.Count; i++)
         {
-            openList.Add(neighbors[i]);
+            Node neighbor = neighbors[i];
 
             int gScore = DetermineGScore(neighbors[i].Position, current.Position);
 
-            CalcValue(current, neighbors[i], gScore);
+            if (openList.Contains(neighbor))
+            {
+                if(current.G + gScore < neighbor.G)
+                {
+                    CalcValue(current, neighbor, gScore);
+                }
+            }else if (!closedList.Contains(neighbor))
+            {
+                CalcValue(current, neighbor, gScore);
+
+                openList.Add(neighbor);
+            }
         }
     }
 
@@ -152,6 +171,11 @@ public class AStar : MonoBehaviour
         openList.Remove(current);
 
         closedList.Add(current);
+
+        if(openList.Count > 0)
+        {
+            current = openList.OrderBy(x => x.F).First();
+        }
     }
 
     private Node GetNode(Vector3Int position)
@@ -181,10 +205,28 @@ public class AStar : MonoBehaviour
         }else if(tileType==TileType.GOAL){
             goalPos = clickPos;
         }
+        //Ignoring all the tiles tipe Water in the Enum list
         if (tileType == TileType.WATER)
         {
             waterTiles.Add(clickPos);
         }
         tileMap.SetTile(clickPos, tiles[(int)tileType]);
+    }
+
+    private Stack<Vector3Int> GeneratePath(Node current)
+    {
+        if(current.Position == goalPos)
+        {
+            Stack<Vector3Int> finalPath = new Stack<Vector3Int>();
+
+            while(current.Position != startPos)
+            {
+                finalPath.Push(current.Position);
+
+                current = current.Parent;
+            }
+            return finalPath;
+        }
+        return null;
     }
 }
