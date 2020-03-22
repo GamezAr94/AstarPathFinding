@@ -23,6 +23,12 @@ public class AStar : MonoBehaviour
 
     private Vector3Int startPos, goalPos;
 
+    private Node current;
+
+    private HashSet<Node> openList;
+
+    private Dictionary<Vector3Int, Node> allNodes = new Dictionary<Vector3Int, Node>();
+
     // Update is called once per frame
     void Update()
     {
@@ -43,9 +49,38 @@ public class AStar : MonoBehaviour
         }
     }
 
+    private void Initialize()
+    {
+        current = GetNode(startPos);
+
+        openList = new HashSet<Node>();
+
+        //Adding start to the open list
+        openList.Add(current);
+    }
+
     private void Algorithm()
     {
-        AStarDebbuger.myInstance.CreateTiles(startPos,goalPos);
+        if (current == null)
+        {
+            Initialize();
+        }
+
+        AStarDebbuger.myInstance.CreateTiles(openList, startPos,goalPos);
+    }
+
+    private Node GetNode(Vector3Int position)
+    {
+        if (allNodes.ContainsKey(position))
+        {
+            return allNodes[position];
+        }
+        else
+        {
+            Node node = new Node(position);
+            allNodes.Add(position,node);
+            return node;
+        }
     }
 
     public void ChangeTileType(TileButton button)
