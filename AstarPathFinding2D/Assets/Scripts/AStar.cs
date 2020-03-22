@@ -29,6 +29,9 @@ public class AStar : MonoBehaviour
 
     private Dictionary<Vector3Int, Node> allNodes = new Dictionary<Vector3Int, Node>();
 
+    //Ignoring Water
+    private List<Vector3Int> waterTiles = new List<Vector3Int>();
+
     // Update is called once per frame
     void Update()
     {
@@ -66,7 +69,40 @@ public class AStar : MonoBehaviour
             Initialize();
         }
 
+        List<Node> neighbors = findNeighbors(current.Position);
+
+        ExamineNeighbors(neighbors,current);
+
         AStarDebbuger.myInstance.CreateTiles(openList, startPos,goalPos);
+    }
+
+    private List<Node> findNeighbors(Vector3Int parentPosition)
+    {
+        List<Node> neighbors = new List<Node>();
+        for(int x = -1; x <= 1; x++)
+        {
+            for(int y = -1; y <= 1; y++)
+            {
+                Vector3Int neighborPos = new Vector3Int(parentPosition.x - x, parentPosition.y - y, parentPosition.z);
+                if(y != 0 || x != 0)
+                {
+                    if (neighborPos != startPos && !waterTiles.Contains(neighborPos) && tileMap.GetTile(neighborPos))
+                    {
+                        Node neighbor = GetNode(neighborPos);
+                        neighbors.Add(neighbor);
+                    }
+                }
+            }
+        }
+        return neighbors;
+    }
+
+    private void ExamineNeighbors(List<Node> neighbors, Node current)
+    {
+        for(int i = 0; i < neighbors.Count; i++)
+        {
+            openList.Add(neighbors[i]);
+        }
     }
 
     private Node GetNode(Vector3Int position)
@@ -95,6 +131,10 @@ public class AStar : MonoBehaviour
             startPos = clickPos;
         }else if(tileType==TileType.GOAL){
             goalPos = clickPos;
+        }
+        if (tileType == TileType.WATER)
+        {
+            waterTiles.Add(clickPos);
         }
         tileMap.SetTile(clickPos, tiles[(int)tileType]);
     }
