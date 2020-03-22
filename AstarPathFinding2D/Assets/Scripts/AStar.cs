@@ -119,6 +119,11 @@ public class AStar : MonoBehaviour
         {
             Node neighbor = neighbors[i];
 
+            if (!ConnectedDiagonally(current,neighbor))
+            {
+                continue;
+            }
+
             int gScore = DetermineGScore(neighbors[i].Position, current.Position);
 
             if (openList.Contains(neighbor))
@@ -211,6 +216,21 @@ public class AStar : MonoBehaviour
             waterTiles.Add(clickPos);
         }
         tileMap.SetTile(clickPos, tiles[(int)tileType]);
+    }
+
+    //Avoid Walk in Diagonall
+    private bool ConnectedDiagonally(Node currentNode, Node neighbor)
+    {
+        Vector3Int direct = currentNode.Position - neighbor.Position;
+
+        Vector3Int first = new Vector3Int(current.Position.x + (direct.x * -1), current.Position.y, current.Position.z);
+        Vector3Int second = new Vector3Int(current.Position.x, current.Position.y + (direct.y * -1), current.Position.z);
+
+        if(waterTiles.Contains(first)|| waterTiles.Contains(second))
+        {
+            return false;
+        }
+        return true; ;
     }
 
     private Stack<Vector3Int> GeneratePath(Node current)
