@@ -118,12 +118,12 @@ public class AStar : MonoBehaviour
         for(int i = 0; i < neighbors.Count; i++)
         {
             Node neighbor = neighbors[i];
-
+            /*
             if (!ConnectedDiagonally(current,neighbor))
             {
                 continue;
             }
-
+            */
             int gScore = DetermineGScore(neighbors[i].Position, current.Position);
 
             if (openList.Contains(neighbor))
@@ -146,8 +146,13 @@ public class AStar : MonoBehaviour
         neighbor.Parent = parent;
 
         neighbor.G = parent.G + cost;
+        #region Manhattan Distance
+        //neighbor.H = ((Math.Abs((neighbor.Position.x - goalPos.x)) + Math.Abs((neighbor.Position.y - goalPos.y))) * 10);
+        #endregion
 
-        neighbor.H = ((Math.Abs((neighbor.Position.x - goalPos.x)) + Math.Abs((neighbor.Position.y - goalPos.y))) * 10);
+        #region  Euclidean Distance
+        neighbor.H = (int)Math.Sqrt(  ((neighbor.Position.x - goalPos.x) * 2 + (neighbor.Position.y - goalPos.y)*2) * 10 );
+        #endregion
 
         neighbor.F = neighbor.G + neighbor.H;
 
@@ -218,6 +223,7 @@ public class AStar : MonoBehaviour
         tileMap.SetTile(clickPos, tiles[(int)tileType]);
     }
 
+    /*
     //Avoid Walk in Diagonall
     private bool ConnectedDiagonally(Node currentNode, Node neighbor)
     {
@@ -232,6 +238,7 @@ public class AStar : MonoBehaviour
         }
         return true; ;
     }
+    */
 
     private Stack<Vector3Int> GeneratePath(Node current)
     {
